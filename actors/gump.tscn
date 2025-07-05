@@ -1,0 +1,62 @@
+[gd_scene load_steps=5 format=3 uid="uid://jfqqq6qvi68d"]
+
+[ext_resource type="Texture2D" uid="uid://q18ksthfsluj" path="res://actors/node/icon_gear.png" id="1_uug7t"]
+
+[sub_resource type="GDScript" id="GDScript_uug7t"]
+script/source = "extends CharacterBody2D
+
+@export var damage : int = 1
+var gravity = ProjectSettings.get_setting(\"physics/2d/default_gravity\")
+@export var movement_direction : int = -1
+
+func _physics_process(delta: float) -> void:
+	if is_on_floor():
+		velocity.y = 0.0
+	
+	if is_on_wall():
+		movement_direction *= -1
+	
+	velocity.y += gravity * delta
+	velocity.x = 50 * movement_direction
+	var collision_info = move_and_slide()
+
+
+
+func hit() -> void:
+	queue_free()
+
+
+func _on_area_2d_body_entered(body: Node2D) -> void:
+	if body.is_in_group(\"player\"):
+		body.hit(self)
+		print(\"die!\")
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gsyqt"]
+size = Vector2(16, 16)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_uug7t"]
+radius = 8.0
+
+[node name="Gump" type="CharacterBody2D" groups=["player_projectile_target"]]
+collision_layer = 4
+slide_on_ceiling = false
+script = SubResource("GDScript_uug7t")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_gsyqt")
+
+[node name="IconGear" type="Sprite2D" parent="."]
+modulate = Color(0.915541, 0, 0.529945, 1)
+texture = ExtResource("1_uug7t")
+
+[node name="VisibleOnScreenEnabler2D" type="VisibleOnScreenEnabler2D" parent="."]
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_uug7t")
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]

@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://6rknk2l5db8u"]
+
+[ext_resource type="Texture2D" uid="uid://crnh5y1l3isou" path="res://actors/node/icon_crate.png" id="1_t662f"]
+
+[sub_resource type="GDScript" id="GDScript_t662f"]
+script/source = "extends Area2D
+
+@export var drops : Array[PackedScene]
+
+func hit() -> void:
+	queue_free()
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_t662f"]
+size = Vector2(16, 16)
+
+[node name="Area2D" type="Area2D" groups=["player_projectile_target"]]
+collision_layer = 4
+collision_mask = 0
+input_pickable = false
+script = SubResource("GDScript_t662f")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_t662f")
+
+[node name="IconCrate" type="Sprite2D" parent="."]
+texture = ExtResource("1_t662f")

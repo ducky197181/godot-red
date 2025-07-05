@@ -1,0 +1,132 @@
+[gd_scene load_steps=12 format=3 uid="uid://d2crk1xd0mlix"]
+
+[ext_resource type="Script" uid="uid://dksvsmop5dt5u" path="res://actors/red_manager.gd" id="1_4wdqj"]
+[ext_resource type="Texture2D" uid="uid://lm1xfcddkb0i" path="res://red.png" id="1_eixpp"]
+[ext_resource type="Script" uid="uid://d274i56sx6th0" path="res://actors/red.gd" id="1_nefka"]
+[ext_resource type="PackedScene" uid="uid://cvh7ctev1fwpa" path="res://actors/projectile_a.tscn" id="2_uahb5"]
+[ext_resource type="FontFile" uid="uid://cfc2i668mhvgl" path="res://external_assets/Tiny5-Regular.ttf" id="3_nwvg0"]
+
+[sub_resource type="Curve" id="Curve_uahb5"]
+_limits = [0.0, 60.0, 0.0, 1.0]
+_data = [Vector2(0.0103093, 1.60427), 0.0, 368.474, 0, 0, Vector2(0.296, 48), 0.0, 0.0, 0, 0, Vector2(0.749141, 0), -224.53, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Curve" id="Curve_nwvg0"]
+_limits = [0.0, 100.0, 0.0, 0.2]
+bake_resolution = 20
+_data = [Vector2(0, 23.3146), 0.0, 1411.32, 0, 0, Vector2(0.102405, 67.1348), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_67oo6"]
+size = Vector2(10, 28)
+
+[sub_resource type="LabelSettings" id="LabelSettings_uahb5"]
+font = ExtResource("3_nwvg0")
+font_size = 8
+
+[sub_resource type="GDScript" id="GDScript_nefka"]
+resource_name = "PlayerCamera"
+script/source = "extends Camera2D
+
+@export var target:Marker2D
+@export var shape:CollisionShape2D
+
+func _on_player_move(delta:float)->void:
+	var tgb:Vector2 = to_local(target.global_position)
+	var rect = shape.shape.get_rect()
+	if not rect.has_point(tgb):
+		var shift_a = tgb - rect.end
+		var shift_b = tgb - rect.position
+		var pos = position
+		
+		if tgb.x < rect.position.x - 1 or tgb.x > rect.end.x + 1:
+			pos.x += shift_a.x if abs(shift_a.x) < abs(shift_b.x) else shift_b.x
+		
+		if tgb.y < rect.position.y or tgb.y > rect.end.y:
+			pos.y += shift_a.y if abs(shift_a.y) < abs(shift_b.y) else shift_b.y
+		
+		position = pos
+		pass
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_nefka"]
+size = Vector2(20, 58)
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_4wdqj")
+
+[node name="Red" type="CharacterBody2D" parent="." groups=["player"]]
+collision_layer = 2
+script = ExtResource("1_nefka")
+jump_curve = SubResource("Curve_uahb5")
+walk_curve = SubResource("Curve_nwvg0")
+projectiles = Array[PackedScene]([ExtResource("2_uahb5")])
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Red"]
+position = Vector2(0, 2)
+shape = SubResource("RectangleShape2D_67oo6")
+
+[node name="Debug" type="Label" parent="Red"]
+visible = false
+offset_left = -20.0
+offset_top = 18.0
+offset_right = 20.0
+offset_bottom = 28.0
+text = "few"
+label_settings = SubResource("LabelSettings_uahb5")
+
+[node name="VisualRoot" type="Node2D" parent="Red"]
+
+[node name="Sprite" type="Sprite2D" parent="Red/VisualRoot"]
+texture = ExtResource("1_eixpp")
+
+[node name="Marker2D" type="Marker2D" parent="Red/VisualRoot"]
+position = Vector2(0, -24)
+
+[node name="AimLoc" type="Node2D" parent="Red/VisualRoot"]
+position = Vector2(0, 16)
+
+[node name="AimUp" type="Marker2D" parent="Red/VisualRoot/AimLoc"]
+position = Vector2(0, -35.5)
+rotation = -1.5708
+gizmo_extents = 1.5
+
+[node name="AimDown" type="Marker2D" parent="Red/VisualRoot/AimLoc"]
+position = Vector2(0, 3.5)
+rotation = -4.71239
+gizmo_extents = 1.5
+
+[node name="AimUpForward" type="Marker2D" parent="Red/VisualRoot/AimLoc"]
+position = Vector2(-10, -31.5)
+rotation = -2.35619
+gizmo_extents = 1.5
+
+[node name="AimForward" type="Marker2D" parent="Red/VisualRoot/AimLoc"]
+position = Vector2(-12, -24)
+rotation = -3.14159
+gizmo_extents = 1.5
+
+[node name="AimDownForward" type="Marker2D" parent="Red/VisualRoot/AimLoc"]
+position = Vector2(-12, -6.5)
+rotation = -3.92699
+gizmo_extents = 1.5
+
+[node name="AimCrouched" type="Marker2D" parent="Red/VisualRoot/AimLoc"]
+position = Vector2(-12, -8)
+rotation = -3.14159
+gizmo_extents = 1.5
+
+[node name="Camera2D" type="Camera2D" parent="." node_paths=PackedStringArray("target", "shape")]
+physics_interpolation_mode = 1
+position = Vector2(0, -24)
+editor_draw_limits = true
+script = SubResource("GDScript_nefka")
+target = NodePath("../Red/VisualRoot/Marker2D")
+shape = NodePath("CollisionShape2D")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Camera2D"]
+position = Vector2(0, -24)
+shape = SubResource("RectangleShape2D_nefka")
+
+[connection signal="on_player_move" from="Red" to="Camera2D" method="_on_player_move"]
+[connection signal="shoot" from="Red" to="." method="_on_red_shoot"]

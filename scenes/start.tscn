@@ -1,0 +1,71 @@
+[gd_scene load_steps=4 format=3 uid="uid://drjh0s88lfr8s"]
+
+[ext_resource type="FontFile" uid="uid://cfc2i668mhvgl" path="res://external_assets/Tiny5-Regular.ttf" id="1_jaeev"]
+
+[sub_resource type="GDScript" id="GDScript_u80x2"]
+resource_name = "StartScene"
+script/source = "extends Node2D
+
+func _ready() -> void:
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
+	
+	var btn : Button = $Control/CenterContainer/HFlowContainer/Start
+	btn.grab_focus()
+	btn.pressed.connect(_on_start_pressed)
+	
+	var ext : Button = $Control/CenterContainer/HFlowContainer/Exit
+	ext.pressed.connect(_on_exit_pressed)
+
+func _on_start_pressed() -> void:
+	print('dink')
+	pass # Replace with function body.
+
+func _on_exit_pressed() -> void:
+	get_tree().quit()
+"
+
+[sub_resource type="Theme" id="Theme_bodal"]
+default_font = ExtResource("1_jaeev")
+default_font_size = 8
+Label/fonts/font = ExtResource("1_jaeev")
+
+[node name="Start" type="Node2D"]
+script = SubResource("GDScript_u80x2")
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+stretch_mode = 3
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 320.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HFlowContainer" type="HFlowContainer" parent="Control/CenterContainer"]
+layout_mode = 2
+
+[node name="Start" type="Button" parent="Control/CenterContainer/HFlowContainer"]
+layout_mode = 2
+theme = SubResource("Theme_bodal")
+text = "Start"
+flat = true
+
+[node name="Exit" type="Button" parent="Control/CenterContainer/HFlowContainer"]
+layout_mode = 2
+theme = SubResource("Theme_bodal")
+text = "Start"
+flat = true

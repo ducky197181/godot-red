@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://cvh7ctev1fwpa"]
+
+[ext_resource type="Script" uid="uid://bpmnbrjl8f8f4" path="res://actors/projectile_boomerang.gd" id="1_vc4or"]
+[ext_resource type="Texture2D" uid="uid://cd31y8lb5vtkf" path="res://tilesets/plh.png" id="1_y05jg"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_vc4or"]
+radius = 6.0
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_vc4or")
+
+[node name="ProjectileA" type="Area2D" parent="."]
+rotation = 3.14159
+collision_layer = 0
+collision_mask = 7
+monitorable = false
+
+[node name="Plh" type="Sprite2D" parent="ProjectileA"]
+texture = ExtResource("1_y05jg")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ProjectileA"]
+shape = SubResource("CircleShape2D_vc4or")
+
+[node name="Marker2D" type="Marker2D" parent="."]
+position = Vector2(112, 0)
+
+[connection signal="area_entered" from="ProjectileA" to="." method="_on_projectile_a_area_entered"]
+[connection signal="body_entered" from="ProjectileA" to="." method="_on_projectile_a_body_entered"]
