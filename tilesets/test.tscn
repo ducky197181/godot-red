@@ -21,3 +21,5 @@ position = Vector2(697, 288)
 
 [node name="CharacterBody2D" parent="." instance=ExtResource("5_tg7m1")]
 position = Vector2(943, 248)
+
+[node name="SubViewport" type="SubViewport" parent="."]
