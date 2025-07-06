@@ -8,6 +8,8 @@ func _init() -> void:
 	assert(err == OK)
 	invulnerability_time = config.get_value("gameplay", "invulnerability_time", 1.0)
 
+var base_levels : Array[BaseLevel] = []
+
 var player_health := 20
 var invulnerability_time : float
 var game_state := GameState.PLAY_STATE
@@ -23,10 +25,21 @@ func damage_player(value: int):
 	player_health_change.emit(player_health)
 
 func load_map(path: String):
-	if game_state == GameState.LOAD_MAP:
-		push_warning("Loading map while one is loading? Abort.")
-		return false
-		
-	var rt = get_tree()
+	ResourceLoader.load_threaded_request(path)
 	
-	pass
+	for level in base_levels:
+		level.prepare_exit()
+		
+	var grace_period = 5.0
+	while grace_period > 0.0 and len(base_levels) > 0:
+		await get_tree().process_frame
+		grace_period += get_process_delta_time()
+	
+	if len(base_levels) > 0:
+		push_warning("Levels did not exit in time.")
+		for level in base_levels:
+			level.queue_free()
+		base_levels.clear()
+
+	var level_scene := ResourceLoader.load_threaded_get(path)
+	get_tree().root.add_child(level_scene.instantiate())
