@@ -39,7 +39,7 @@ func fuzzy(a, b = 0.1):
 	return a > 0 and a < b
 
 func hit(source : Node, type = DAMAGE) -> void:
-	pass
+	Game.damage_player(-2)
 
 func change_state(state_group:Array, state) -> void:
 	state_group[0] = state
