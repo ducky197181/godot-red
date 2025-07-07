@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=4 uid="uid://ccey4mru7tg3e"]
+[gd_scene load_steps=7 format=4 uid="uid://ccey4mru7tg3e"]
 
 [ext_resource type="PackedScene" uid="uid://d2crk1xd0mlix" path="res://actors/red.tscn" id="1_67oo6"]
 [ext_resource type="Script" uid="uid://bs7b67tsmvpqq" path="res://core/base_level.gd" id="1_tg7m1"]
 [ext_resource type="TileSet" uid="uid://vyyf260giaqu" path="res://tilesets/blue_env.tres" id="3_cc4y8"]
 [ext_resource type="PackedScene" uid="uid://6rknk2l5db8u" path="res://actors/crate.tscn" id="4_d7wpy"]
 [ext_resource type="PackedScene" uid="uid://jfqqq6qvi68d" path="res://actors/gump.tscn" id="5_tg7m1"]
+[ext_resource type="PackedScene" uid="uid://cqgf4ppw4c2wp" path="res://scenes/canvas_layer_game_ui.tscn" id="6_7dmsb"]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_tg7m1")
@@ -32,5 +33,7 @@ offset_top = 244.0
 offset_right = 654.0
 offset_bottom = 279.0
 text = "E"
+
+[node name="CanvasLayer_GameUI" parent="." instance=ExtResource("6_7dmsb")]
 
 [connection signal="button_up" from="Button" to="." method="switch_level" flags=6 binds= [&"res://scenes/start.tscn"]]
