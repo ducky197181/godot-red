@@ -9,6 +9,7 @@ func _init() -> void:
 	invulnerability_time = config.get_value("gameplay", "invulnerability_time", 1.0)
 
 var base_levels : Array[BaseLevel] = []
+var base_levels : Array[BaseScene] = []
 
 var player_health := 20
 var invulnerability_time : float

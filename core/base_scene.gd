@@ -1,9 +1,10 @@
 extends Node2D
 
-class_name BaseLevel
+class_name BaseScene
 
 func _ready():
 	Game.base_levels.push_back(self)
+	var root:CanvasLayer = await Game.add_as_base_scene(self)
 	self.modulate = Color(1.0, 1.0, 1.0, 0.0)
 	var tw = create_tween()
 	tw.tween_property(self, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.25)
