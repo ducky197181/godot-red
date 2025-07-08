@@ -33,7 +33,7 @@ func load_map(path: String):
 	var grace_period = 5.0
 	while grace_period > 0.0 and len(base_levels) > 0:
 		await get_tree().process_frame
-		grace_period += get_process_delta_time()
+		grace_period -= get_process_delta_time()
 	
 	if len(base_levels) > 0:
 		push_warning("Levels did not exit in time.")
