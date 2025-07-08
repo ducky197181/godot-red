@@ -46,18 +46,33 @@ func change_state(state_group:Array, state) -> void:
 	state_group[3] = state_group[2]
 	state_group[2] = 0.0
 
+# Keep movement inputs from previous process.
+# This allows moving when player input is disabled for animation or transitions.
+# Care needs to be taken if character needs to stay put that these values are reset.
+var input_left:float
+var input_right:float
+var input_vector:Vector2
+var input_sign:Vector2i
+var input_jump:bool
+
 func _physics_process(delta: float) -> void:
 	var walk_effect : float = 0.0
 	var gravity_effect : float = 0.0
+
+	var process_input:bool = Game.can_process_input(self)
+	var attack:bool
 	
-	var input_left := Input.is_action_pressed("move_left")
-	var input_right := Input.is_action_pressed("move_right")
-	var input_vector := Input.get_vector("move_left", "move_right", "Down", "Up")
-	var input_sign := Vector2i(sign(input_vector.x), sign(input_vector.y))
-	var attack := Input.is_action_just_pressed("Fire")
+	
+	if process_input:
+		input_left = Input.is_action_pressed("move_left")
+		input_right = Input.is_action_pressed("move_right")
+		input_vector = Input.get_vector("move_left", "move_right", "Down", "Up")
+		input_sign = Vector2i(sign(input_vector.x), sign(input_vector.y))
+		input_jump = Input.is_action_pressed("jump")
+		attack = Input.is_action_just_pressed("Fire")
 	
 	grounded_timer = max(delta, grounded_timer + delta) if is_on_floor() else min(-delta, grounded_timer - delta)
-	jump_timer = max(delta, jump_timer + delta) if Input.is_action_pressed("jump") else min(-delta, jump_timer - delta)
+	jump_timer = max(delta, jump_timer + delta) if input_jump else min(-delta, jump_timer - delta)
 
 	for state in states:
 		state[1] = state[0]
