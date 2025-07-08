@@ -31,6 +31,7 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="Label" type="Label" parent="Control"]
+layout_mode = 0
 offset_left = 5.0
 offset_top = 5.0
 offset_right = 46.935
