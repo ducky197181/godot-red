@@ -4,17 +4,17 @@ extends CharacterBody2D
 var jump_curve_time : float = 10.0
 @export var walk_curve : Curve
 
-
-
-
 var grounded_timer:float = 0.0
 var jump_timer: float = 0.0
+var pushback:int = 0
 
 @export var projectiles: Array[PackedScene]
 
 signal on_player_move(deltatime:float)
 signal shoot(bullet:PackedScene, spawn_point:Transform2D)
 
+# Using strings instead of enums to help debugging during development.
+# Can be changed to enums later.
 const UNKNOWN = "unknown"
 const READY = "ready"
 const GROUNDED = "grounded"
@@ -25,6 +25,8 @@ const IDLE = "idle"
 const ATTACK = "attack"
 const COOLDOWN = "cooldown"
 const DAMAGE = "damage"
+const KO = "KO"
+const NONE = "NONE"
 
 # States: Current, Previous, Current age, Previous age
 var control_state := [UNKNOWN, UNKNOWN, 0.0, 0.0]
@@ -38,8 +40,19 @@ var states = [control_state, horizontal_state, vertical_state, attack_state]
 func fuzzy(a, b = 0.1):
 	return a > 0 and a < b
 
-func hit(source : Node, type = DAMAGE) -> void:
-	Game.damage_player(-2)
+func switch_timer(source:float, delta:float, switch:bool):
+	if switch:
+		return max(delta, source + delta)
+	return min(-delta, source - delta)
+
+func hit(source : Node2D, type = DAMAGE) -> void:
+	if control_state[0] == READY:
+		pushback = signi(int(global_position.x - source.global_position.x))
+		Game.damage_player(-30)
+		if Game.player_health <= 0:
+			change_state(control_state, KO)
+		else:
+			change_state(control_state, type)
 
 func change_state(state_group:Array, state) -> void:
 	state_group[0] = state
@@ -60,8 +73,10 @@ func _physics_process(delta: float) -> void:
 	var gravity_effect : float = 0.0
 
 	var process_input:bool = Game.can_process_input(self)
+	if control_state[0] == DAMAGE or control_state[0] == KO:
+		# This will require more granularity if different damage types are implemented
+		process_input = false
 	var attack:bool
-	
 	
 	if process_input:
 		input_left = Input.is_action_pressed("move_left")
@@ -71,14 +86,31 @@ func _physics_process(delta: float) -> void:
 		input_jump = Input.is_action_pressed("jump")
 		attack = Input.is_action_just_pressed("Fire")
 	
-	grounded_timer = max(delta, grounded_timer + delta) if is_on_floor() else min(-delta, grounded_timer - delta)
-	jump_timer = max(delta, jump_timer + delta) if input_jump else min(-delta, jump_timer - delta)
+	grounded_timer = switch_timer(grounded_timer, delta, is_on_floor())
+	jump_timer = switch_timer(jump_timer, delta, input_jump)
 
 	for state in states:
 		state[1] = state[0]
 		state[2] += delta
 	
 	# Adjust only state
+	match control_state:
+		[UNKNOWN, UNKNOWN, ..]:
+			change_state(control_state, READY)
+		[READY, DAMAGE]: # 
+			change_state(vertical_state, UNKNOWN)
+			change_state(horizontal_state, UNKNOWN)
+		[DAMAGE, READY, ..]:
+			change_state(vertical_state, DAMAGE)
+			change_state(horizontal_state, DAMAGE)
+		[DAMAGE, _, var age, ..] when age > 0.2:
+			change_state(control_state, COOLDOWN)
+		[COOLDOWN, _, var age, ..] when age > Game.invulnerability_time:
+			change_state(control_state, READY)
+		[KO, _, var age, ..] when age > 0.1:
+			Game.load_scene("res://tilesets/test.tscn")
+			change_state(control_state, NONE)
+	
 	match attack_state:
 		[UNKNOWN, ..]:
 			change_state(attack_state, READY)
@@ -86,8 +118,6 @@ func _physics_process(delta: float) -> void:
 			change_state(attack_state, READY)
 		[READY, _, var age, ..] when attack and age > 0.1:
 			change_state(attack_state, ATTACK)
-	
-	
 	
 	match vertical_state:
 		[UNKNOWN, ..]: # Unknown
@@ -163,13 +193,21 @@ func _physics_process(delta: float) -> void:
 	var b := jump_curve.sample(jump_curve_time)
 	gravity_effect = (a-b) / delta
 
-	$Debug.text = "%s / %s" % [jump_curve_time , gravity_effect]
-	
 	velocity.y = gravity_effect
 	velocity.x = walk_effect
 	
+	match control_state:
+		[DAMAGE, ..]:
+			velocity.y = 0
+			velocity.x = 150 * pushback
+		[COOLDOWN, _, var age, ..]:
+			var opacity = 1.0 if sin(age*50) < 0.0 else 0.5
+			$VisualRoot/Sprite.self_modulate = Color(1,1,1, opacity)
+		[READY, COOLDOWN, ..]:
+			$VisualRoot/Sprite.self_modulate = Color(1,1,1,1)
+		[KO, ..]:
+			velocity.x = 0
+			velocity.y = 0
 	
-	#velocity.y = vertical_curve.sample(jump_marker) * 200
-	#get_input()
 	var collision_info = move_and_slide()
 	on_player_move.emit(delta)
