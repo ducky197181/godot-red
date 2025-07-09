@@ -1,6 +1,26 @@
-[gd_scene load_steps=4 format=3 uid="uid://cqgf4ppw4c2wp"]
+[gd_scene load_steps=18 format=3 uid="uid://cqgf4ppw4c2wp"]
 
+[ext_resource type="Texture2D" uid="uid://cuqh3aa0uspmg" path="res://ui/RedHealth.png" id="1_cqqb8"]
 [ext_resource type="FontFile" uid="uid://cfc2i668mhvgl" path="res://external_assets/Tiny5-Regular.ttf" id="1_j87l7"]
+[ext_resource type="Texture2D" uid="uid://dccol0mog6swj" path="res://ui/RedHealthNeutral.png" id="2_cytup"]
+[ext_resource type="Texture2D" uid="uid://8binbvvpj2t3" path="res://ui/RedHealthStressed.png" id="2_yv0vd"]
+[ext_resource type="Texture2D" uid="uid://c8wj06vi4mvx" path="res://ui/RedHealthHit.png" id="3_cytup"]
+
+[sub_resource type="GDScript" id="GDScript_cqqb8"]
+script/source = "extends CanvasLayer
+
+@onready var animation_tree:AnimationTree = $AnimationTree
+
+func _enter_tree() -> void:
+	Game.player_health_change.connect(_player_health_change)
+
+func _player_health_change(new_value:int) -> void:
+	animation_tree.set(\"parameters/get_hit/request\", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
+	if new_value <= 14:
+		$Control/RedHealthNeutral.visible = true
+	if new_value <= 6:
+		$Control/RedHealthStressed.visible = true
+"
 
 [sub_resource type="LabelSettings" id="LabelSettings_4wdqj"]
 font = ExtResource("1_j87l7")
@@ -15,14 +35,139 @@ func _enter_tree() -> void:
 	Game.player_health_change.connect(_player_health_change)
 
 func _player_health_change(new_value:int) -> void:
-	self.text = str(new_value)
+	self.text = \"{0} / 20\".format([str(new_value)])
 
 func _exit_tree() -> void:
 	Game.player_health_change.disconnect(_player_health_change)
 "
 
+[sub_resource type="Animation" id="Animation_yv0vd"]
+resource_name = "HIT"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Control:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0666667, 0.133333, 0.2, 0.266667, 0.333333),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Vector2(0, 0), Vector2(-1, 2), Vector2(0, -3), Vector2(1, 2), Vector2(0, -1), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Control/RedHealthHit:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.34),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[sub_resource type="Animation" id="Animation_n3lhv"]
+resource_name = "IN"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Control:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.133333),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Control:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.333333),
+"transitions": PackedFloat32Array(0.450625, 1),
+"update": 0,
+"values": [Vector2(15, 0), Vector2(4.01773e-06, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_cytup"]
+resource_name = "KO"
+
+[sub_resource type="Animation" id="Animation_cqqb8"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Control:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Control:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(4.01773e-06, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Control/RedHealthHit:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_cytup"]
+_data = {
+&"HIT": SubResource("Animation_yv0vd"),
+&"IN": SubResource("Animation_n3lhv"),
+&"KO": SubResource("Animation_cytup"),
+&"RESET": SubResource("Animation_cqqb8")
+}
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_cqqb8"]
+animation = &"HIT"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_b0865"]
+animation = &"IN"
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_mqdf8"]
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_ceh0c"]
+nodes/Animation/node = SubResource("AnimationNodeAnimation_b0865")
+nodes/Animation/position = Vector2(160, 120)
+"nodes/Animation 2/node" = SubResource("AnimationNodeAnimation_cqqb8")
+"nodes/Animation 2/position" = Vector2(166, 356)
+nodes/get_hit/node = SubResource("AnimationNodeOneShot_mqdf8")
+nodes/get_hit/position = Vector2(420, 140)
+nodes/output/position = Vector2(720, 160)
+node_connections = [&"get_hit", 0, &"Animation", &"get_hit", 1, &"Animation 2", &"output", 0, &"get_hit"]
+
 [node name="CanvasLayer_GameUI" type="CanvasLayer"]
 layer = 10
+script = SubResource("GDScript_cqqb8")
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -30,12 +175,40 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
+[node name="RedHealth" type="Sprite2D" parent="Control"]
+position = Vector2(36, 20)
+texture = ExtResource("1_cqqb8")
+
+[node name="RedHealthNeutral" type="Sprite2D" parent="Control"]
+visible = false
+position = Vector2(36, 20)
+texture = ExtResource("2_cytup")
+
+[node name="RedHealthStressed" type="Sprite2D" parent="Control"]
+visible = false
+position = Vector2(36, 20)
+texture = ExtResource("2_yv0vd")
+
+[node name="RedHealthHit" type="Sprite2D" parent="Control"]
+visible = false
+position = Vector2(36, 20)
+texture = ExtResource("3_cytup")
+
 [node name="Label" type="Label" parent="Control"]
 layout_mode = 0
-offset_left = 5.0
-offset_top = 5.0
-offset_right = 46.935
-offset_bottom = 28.0
+offset_left = 33.0
+offset_top = 20.0
+offset_right = 55.0
+offset_bottom = 29.0
 text = "HP"
 label_settings = SubResource("LabelSettings_4wdqj")
 script = SubResource("GDScript_4wdqj")
+
+[node name="AnimationTree" type="AnimationTree" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_cytup")
+}
+tree_root = SubResource("AnimationNodeBlendTree_ceh0c")
+parameters/get_hit/active = false
+parameters/get_hit/internal_active = false
+parameters/get_hit/request = 0
