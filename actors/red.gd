@@ -47,7 +47,10 @@ func switch_timer(source:float, delta:float, switch:bool):
 
 func hit(source : Node2D, type = DAMAGE) -> void:
 	if control_state[0] == READY:
-		pushback = signi(int(global_position.x - source.global_position.x))
+		if source:
+			pushback = signi(int(global_position.x - source.global_position.x))
+		else:
+			pushback = $VisualRoot.scale.x
 		Game.damage_player(-5)
 		if Game.player_health <= 0:
 			change_state(control_state, KO)
@@ -107,7 +110,7 @@ func _physics_process(delta: float) -> void:
 			change_state(control_state, COOLDOWN)
 		[COOLDOWN, _, var age, ..] when age > Game.invulnerability_time:
 			change_state(control_state, READY)
-		[KO, _, var age, ..] when age > 0.1:
+		[KO, _, var age, ..] when age > 0.3:
 			Game.player_health = 20
 			Game.load_scene("res://tilesets/test.tscn")
 			change_state(control_state, NONE)
