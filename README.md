@@ -41,6 +41,6 @@ Each cleared level, however, reduces the challenge in others, by limiting certai
 
 ## License
 
-Code is released under [MIT license](LICENSE.txt).
+Code is released under [MIT license](LICENSE).
 
 All art and assets included in this project are © ducky197181. Unless otherwise specified, these materials are copyrighted and may not be used, reproduced, or distributed without explicit permission.
