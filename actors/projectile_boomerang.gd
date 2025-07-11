@@ -11,6 +11,13 @@ var age := 0.0
 var turnspeed = 6
 var speed = 80.0
 
+var command_obj: Dictionary
+
+func _ready() -> void:
+	command_obj = {
+		"damage": 5
+	}
+
 func set_moving_target(tg : Node2D, launch := 0, timer := 1.0):
 	timer = lerpf(0.2, 1.0, min(timer, 1.0))
 	target.position.x *= timer
@@ -36,14 +43,14 @@ func _physics_process(delta: float) -> void:
 
 
 func _on_projectile_a_body_entered(body: Node2D) -> void:
-	if body.is_in_group("player_projectile_target") and body.has_method("hit"):
-		body.hit()
+	if body.is_in_group("player_projectile_target") and body.has_method("command"):
+		body.command(command_obj)
 		queue_free()
 	if age > 1.0 and body.is_in_group("player"):
 		queue_free()
 
 
 func _on_projectile_a_area_entered(area: Area2D) -> void:
-	if area.is_in_group("player_projectile_target") and area.has_method("hit"):
-		area.hit()
+	if area.is_in_group("player_projectile_target") and area.has_method("command"):
+		area.command(command_obj)
 		queue_free()

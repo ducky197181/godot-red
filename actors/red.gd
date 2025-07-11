@@ -45,18 +45,22 @@ func switch_timer(source:float, delta:float, switch:bool):
 		return max(delta, source + delta)
 	return min(-delta, source - delta)
 
-func hit(source : Node2D, type = DAMAGE) -> void:
-	if control_state[0] == READY:
-		if source:
-			pushback = signi(int(global_position.x - source.global_position.x))
-		else:
-			pushback = $VisualRoot.scale.x
-		Game.damage_player(-5)
-		if Game.player_health <= 0:
-			change_state(control_state, KO)
-		else:
-			change_state(control_state, type)
 
+func command(attributes: Dictionary) -> void:
+	if control_state[0] == READY:
+		match attributes:
+			{"damage": var dmg, ..}:
+				Game.affect_player_health(-absi(dmg))
+				var next_state = DAMAGE if Game.player_health > 0 else KO
+				change_state(control_state, next_state)
+		
+		if control_state[0] == DAMAGE:
+			match(attributes):
+				{"damage", "source": var src, ..}:
+					pushback = signi(int(global_position.x - src.global_position.x))
+				_:
+					pushback = 0
+		
 func change_state(state_group:Array, state) -> void:
 	state_group[0] = state
 	state_group[3] = state_group[2]
@@ -202,8 +206,9 @@ func _physics_process(delta: float) -> void:
 	
 	match control_state:
 		[DAMAGE, ..]:
-			velocity.y = 0
-			velocity.x = 150 * pushback
+			if pushback != 0:
+				velocity.y = 0
+				velocity.x = 150 * pushback
 		[COOLDOWN, _, var age, ..]:
 			var opacity = 1.0 if sin(age*50) < 0.0 else 0.5
 			$VisualRoot/Sprite.self_modulate = Color(1,1,1, opacity)

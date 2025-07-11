@@ -7,8 +7,10 @@ script/source = "extends Area2D
 
 @export var drops : Array[PackedScene]
 
-func hit() -> void:
-	queue_free()
+func command(cmd) -> void:
+	match cmd:
+		{\"damage\", ..}:
+			queue_free()
 "
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t662f"]

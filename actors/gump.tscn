@@ -9,6 +9,15 @@ script/source = "extends CharacterBody2D
 var gravity = ProjectSettings.get_setting(\"physics/2d/default_gravity\")
 @export var movement_direction : int = -1
 
+var hit_dictionary : Dictionary
+
+func _ready() -> void:
+	hit_dictionary = {
+		\"damage\": damage,
+		\"source\": self
+	}
+	hit_dictionary.make_read_only()
+
 func _physics_process(delta: float) -> void:
 	if is_on_floor():
 		velocity.y = 0.0
@@ -18,18 +27,16 @@ func _physics_process(delta: float) -> void:
 	
 	velocity.y += gravity * delta
 	velocity.x = 50 * movement_direction
-	var collision_info = move_and_slide()
+	move_and_slide()
 
-
-
-func hit() -> void:
-	queue_free()
-
+func command(cmd) -> void:
+	match cmd:
+		{\"damage\", ..}:
+			queue_free()
 
 func _on_area_2d_body_entered(body: Node2D) -> void:
 	if body.is_in_group(\"player\"):
-		body.hit(self)
-		print(\"die!\")
+		body.command(hit_dictionary)
 "
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gsyqt"]

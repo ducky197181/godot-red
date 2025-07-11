@@ -44,7 +44,7 @@ var invulnerability_time : float
 
 signal player_health_change(value: int)
 
-func damage_player(value: int):
+func affect_player_health(value: int):
 	var target: = clampi(player_health + value, 0, 20)
 	var diff = target - player_health
 	if diff == 0:
