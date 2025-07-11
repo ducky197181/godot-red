@@ -174,7 +174,6 @@ func _physics_process(delta: float) -> void:
 				var s = Vector2(float(-input_sign.x), 1.0)
 				if s.x != 0:
 					$VisualRoot.scale = s
-					input_sign.x
 		[IDLE, ..]:
 			walk_effect = 0.0
 	
@@ -218,5 +217,5 @@ func _physics_process(delta: float) -> void:
 			velocity.x = 0
 			velocity.y = 0
 	
-	var collision_info = move_and_slide()
+	var _collision_info = move_and_slide()
 	on_player_move.emit(delta)

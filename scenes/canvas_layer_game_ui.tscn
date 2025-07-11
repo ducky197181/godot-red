@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://cqgf4ppw4c2wp"]
+[gd_scene load_steps=20 format=3 uid="uid://cqgf4ppw4c2wp"]
 
 [ext_resource type="Texture2D" uid="uid://cuqh3aa0uspmg" path="res://ui/RedHealth.png" id="1_cqqb8"]
 [ext_resource type="FontFile" uid="uid://cfc2i668mhvgl" path="res://external_assets/Tiny5-Regular.ttf" id="1_j87l7"]
@@ -14,8 +14,13 @@ script/source = "extends CanvasLayer
 func _enter_tree() -> void:
 	Game.player_health_change.connect(_player_health_change)
 
+func _exit_tree() -> void:
+	Game.player_health_change.disconnect(_player_health_change)
+
 func _player_health_change(new_value:int) -> void:
 	animation_tree.set(\"parameters/get_hit/request\", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
+	if new_value == 0:
+		animation_tree.set(\"parameters/ko/blend_amount\", 1.0)
 	if new_value <= 14:
 		$Control/RedHealthNeutral.visible = true
 	if new_value <= 6:
@@ -99,6 +104,19 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id="Animation_cytup"]
 resource_name = "KO"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Control/RedHealthHit:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
 
 [sub_resource type="Animation" id="Animation_cqqb8"]
 length = 0.001
@@ -150,20 +168,31 @@ _data = {
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_cqqb8"]
 animation = &"HIT"
 
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_cytup"]
+animation = &"KO"
+
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_b0865"]
 animation = &"IN"
 
 [sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_mqdf8"]
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_b0865"]
+filter_enabled = true
+filters = ["Control/RedHealthHit:visible"]
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_ceh0c"]
 nodes/Animation/node = SubResource("AnimationNodeAnimation_b0865")
 nodes/Animation/position = Vector2(160, 120)
 "nodes/Animation 2/node" = SubResource("AnimationNodeAnimation_cqqb8")
 "nodes/Animation 2/position" = Vector2(166, 356)
+"nodes/Animation 3/node" = SubResource("AnimationNodeAnimation_cytup")
+"nodes/Animation 3/position" = Vector2(420, 480)
 nodes/get_hit/node = SubResource("AnimationNodeOneShot_mqdf8")
 nodes/get_hit/position = Vector2(420, 140)
-nodes/output/position = Vector2(720, 160)
-node_connections = [&"get_hit", 0, &"Animation", &"get_hit", 1, &"Animation 2", &"output", 0, &"get_hit"]
+nodes/ko/node = SubResource("AnimationNodeBlend2_b0865")
+nodes/ko/position = Vector2(680, 200)
+nodes/output/position = Vector2(880, 160)
+node_connections = [&"get_hit", 0, &"Animation", &"get_hit", 1, &"Animation 2", &"ko", 0, &"get_hit", &"ko", 1, &"Animation 3", &"output", 0, &"ko"]
 
 [node name="CanvasLayer_GameUI" type="CanvasLayer"]
 layer = 10
@@ -212,3 +241,4 @@ tree_root = SubResource("AnimationNodeBlendTree_ceh0c")
 parameters/get_hit/active = false
 parameters/get_hit/internal_active = false
 parameters/get_hit/request = 0
+parameters/ko/blend_amount = 0

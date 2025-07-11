@@ -5,7 +5,7 @@ class_name BaseScene
 func _ready():
 	self.modulate = Color(1.0, 1.0, 1.0, 0.0)
 	Game.base_levels.push_back(self)
-	var root:CanvasLayer = await Game.add_as_base_scene(self)
+	var _root:CanvasLayer = await Game.add_as_base_scene(self)
 	var tw = create_tween()
 	tw.tween_property(self, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.25)
 
