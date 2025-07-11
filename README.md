@@ -38,3 +38,9 @@ Each cleared level, however, reduces the challenge in others, by limiting certai
 - Write logic with GDScript.
 - Use groups and duck typing.
 - Don't over-engineer.
+
+## License
+
+Code is released under [MIT license](LICENSE).
+
+All art and assets included in this project are © ducky197181. Unless otherwise specified, these materials are copyrighted and may not be used, reproduced, or distributed without explicit permission.
