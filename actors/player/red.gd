@@ -51,6 +51,7 @@ func command(attributes: Dictionary) -> void:
 		match attributes:
 			{"damage": var dmg, ..}:
 				Game.affect_player_health(-absi(dmg))
+				$VisualRoot/Sprite.material = Game.blink_sprite
 				var next_state = DAMAGE if Game.player_health > 0 else KO
 				change_state(control_state, next_state)
 		
@@ -208,6 +209,9 @@ func _physics_process(delta: float) -> void:
 			if pushback != 0:
 				velocity.y = 0
 				velocity.x = 150 * pushback
+				Game.ghost_trail($VisualRoot/Sprite)
+		[COOLDOWN, DAMAGE, ..]:
+			$VisualRoot/Sprite.material = null
 		[COOLDOWN, _, var age, ..]:
 			var opacity = 1.0 if sin(age*50) < 0.0 else 0.5
 			$VisualRoot/Sprite.self_modulate = Color(1,1,1, opacity)

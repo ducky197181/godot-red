@@ -11,6 +11,8 @@ func _ready() -> void:
 	}
 	command_obj.make_read_only()
 
+func _physics_process(delta: float) -> void:
+	Game.ghost_trail($IconCircle)
 
 func _on_body_entered(body: Node) -> void:
 	if body.has_method("command"):

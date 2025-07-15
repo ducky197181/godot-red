@@ -72,3 +72,26 @@ func load_scene(path: String):
 
 	var level_scene := ResourceLoader.load_threaded_get(path)
 	get_tree().root.add_child(level_scene.instantiate())
+
+
+@onready var blink_sprite : ShaderMaterial = load("uid://cdgo3xge27wll")
+func ghost_trail(source: Sprite2D):
+	if source.has_meta("trail_pos"):
+		var tt : Vector2 = source.get_meta("trail_pos")
+		var current := source.global_position
+		if current.distance_to(tt) < 5:
+			return
+		
+	for bl in base_levels:
+		if bl.is_ancestor_of(source):
+			var ghost:Sprite2D = source.duplicate()
+			ghost.z_index = -1
+			ghost.material = blink_sprite
+			bl.add_child(ghost)
+			ghost.global_position = source.global_position
+			ghost.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+			source.set_meta("trail_pos", source.global_position)
+			var tw := get_tree().create_tween()
+			tw.tween_property(ghost, "modulate", Color(1.0, 1.0, 1.0, 0.0), 0.2)
+			tw.finished.connect(ghost.queue_free)
+			return
