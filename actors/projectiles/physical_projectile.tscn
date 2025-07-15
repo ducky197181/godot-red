@@ -1,0 +1,29 @@
+[gd_scene load_steps=4 format=3 uid="uid://c22hwwfqr3c4u"]
+
+[ext_resource type="Texture2D" uid="uid://dcnenlraq4w4t" path="res://external_assets/node/icon_circle.png" id="1_j8fpy"]
+[ext_resource type="Script" uid="uid://fwp811h3teal" path="res://actors/projectiles/projectile.gd" id="1_mv0d1"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mv0d1"]
+radius = 3.0
+
+[node name="PhysicalProjectile" type="RigidBody2D"]
+collision_layer = 0
+collision_mask = 3
+gravity_scale = 0.2
+can_sleep = false
+contact_monitor = true
+max_contacts_reported = 1
+script = ExtResource("1_mv0d1")
+
+[node name="IconCircle" type="Sprite2D" parent="."]
+self_modulate = Color(0.865946, 2.11775e-06, 0.514549, 1)
+scale = Vector2(0.375, 0.375)
+texture = ExtResource("1_j8fpy")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_mv0d1")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="queue_free" flags=3]
