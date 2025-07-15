@@ -1,9 +1,9 @@
 [gd_scene load_steps=12 format=3 uid="uid://d2crk1xd0mlix"]
 
-[ext_resource type="Script" uid="uid://dksvsmop5dt5u" path="res://actors/red_manager.gd" id="1_4wdqj"]
-[ext_resource type="Texture2D" uid="uid://lm1xfcddkb0i" path="res://actors/red.png" id="1_eixpp"]
-[ext_resource type="Script" uid="uid://d274i56sx6th0" path="res://actors/red.gd" id="1_nefka"]
-[ext_resource type="PackedScene" uid="uid://cvh7ctev1fwpa" path="res://actors/projectile_a.tscn" id="2_uahb5"]
+[ext_resource type="Script" uid="uid://dksvsmop5dt5u" path="res://actors/player/red_manager.gd" id="1_4wdqj"]
+[ext_resource type="Texture2D" uid="uid://lm1xfcddkb0i" path="res://actors/player/red.png" id="1_eixpp"]
+[ext_resource type="Script" uid="uid://d274i56sx6th0" path="res://actors/player/red.gd" id="1_nefka"]
+[ext_resource type="PackedScene" uid="uid://cvh7ctev1fwpa" path="res://actors/projectiles/projectile_a.tscn" id="2_uahb5"]
 [ext_resource type="FontFile" uid="uid://cfc2i668mhvgl" path="res://external_assets/Tiny5-Regular.ttf" id="3_nwvg0"]
 
 [sub_resource type="Curve" id="Curve_uahb5"]
