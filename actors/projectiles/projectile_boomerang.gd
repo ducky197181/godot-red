@@ -40,6 +40,7 @@ func _physics_process(delta: float) -> void:
 	var v = Vector2.RIGHT.rotated(dir)
 	projectile.position = projectile.position + (v * delta * speed)
 	$ProjectileA/Plh.rotate(PI * delta)
+	Game.ghost_trail($ProjectileA/Plh)
 
 
 func _on_projectile_a_body_entered(body: Node2D) -> void:
