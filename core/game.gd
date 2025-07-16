@@ -75,8 +75,8 @@ func load_scene(path: String):
 
 
 @onready var blink_sprite : ShaderMaterial = load("uid://cdgo3xge27wll")
-func ghost_trail(source: Sprite2D):
-	if source.has_meta("trail_pos"):
+func ghost_trail(source: Sprite2D, limit:StringName="trail_pos"):
+	if limit == "trail_pos" and source.has_meta(limit):
 		var tt : Vector2 = source.get_meta("trail_pos")
 		var current := source.global_position
 		if current.distance_to(tt) < 5:
