@@ -27,6 +27,7 @@ const COOLDOWN = "cooldown"
 const DAMAGE = "damage"
 const KO = "KO"
 const NONE = "NONE"
+const SMALL = "small"
 
 # States: Current, Previous, Current age, Previous age
 var control_state := [UNKNOWN, UNKNOWN, 0.0, 0.0]
@@ -45,13 +46,15 @@ func switch_timer(source:float, delta:float, switch:bool):
 		return max(delta, source + delta)
 	return min(-delta, source - delta)
 
+func ghost() -> void:
+	Game.ghost_trail($Sprite, "")
 
 func command(attributes: Dictionary) -> void:
 	if control_state[0] == READY:
 		match attributes:
 			{"damage": var dmg, ..}:
 				Game.affect_player_health(-absi(dmg))
-				$VisualRoot/Sprite.material = Game.blink_sprite
+				$Sprite.material = Game.blink_sprite
 				var next_state = DAMAGE if Game.player_health > 0 else KO
 				change_state(control_state, next_state)
 		
@@ -85,6 +88,7 @@ func _physics_process(delta: float) -> void:
 		# This will require more granularity if different damage types are implemented
 		process_input = false
 	var attack:bool
+	var size_shift:bool
 	
 	if process_input:
 		input_left = Input.is_action_pressed("move_left")
@@ -93,6 +97,7 @@ func _physics_process(delta: float) -> void:
 		input_sign = Vector2i(sign(input_vector.x), sign(input_vector.y))
 		input_jump = Input.is_action_pressed("jump")
 		attack = Input.is_action_just_pressed("Fire")
+		size_shift = Input.is_action_just_pressed("size_toggle")
 	
 	grounded_timer = switch_timer(grounded_timer, delta, is_on_floor())
 	jump_timer = switch_timer(jump_timer, delta, input_jump)
@@ -119,13 +124,17 @@ func _physics_process(delta: float) -> void:
 			Game.player_health = 20
 			Game.load_scene("res://tilesets/test.tscn")
 			change_state(control_state, NONE)
+		[READY, ..] when size_shift:
+			change_state(control_state, SMALL)
+		[SMALL, ..] when size_shift:
+			change_state(control_state, READY)
 	
 	match attack_state:
 		[UNKNOWN, ..]:
 			change_state(attack_state, READY)
 		[ATTACK, ..]: # Previously attacked, return to Ready
 			change_state(attack_state, READY)
-		[READY, _, var age, ..] when attack and age > 0.1:
+		[READY, _, var age, ..] when attack and age > 0.1 and control_state[0] != SMALL:
 			change_state(attack_state, ATTACK)
 	
 	match vertical_state:
@@ -139,6 +148,7 @@ func _physics_process(delta: float) -> void:
 				vertical_state[1] = GROUNDED
 				vertical_state[0] = JUMPING
 		[FALLING, ..] when fuzzy(-grounded_timer) and fuzzy(jump_timer): # coyote
+			print("coyote")
 			change_state(vertical_state, JUMPING)
 		[GROUNDED, ..] when fuzzy(jump_timer): # jump on ground
 			change_state(vertical_state, JUMPING)
@@ -160,6 +170,8 @@ func _physics_process(delta: float) -> void:
 			jump_curve_time = jump_curve.get_point_position(1).x
 		[JUMPING, _, ..]:
 			jump_curve_time = 0.0
+			if control_state[0] == SMALL:
+				jump_curve_time = jump_curve.get_point_position(1).x * 0.7
 		[FALLING, JUMPING, ..]:
 			jump_curve_time = jump_curve.get_point_position(1).x
 		[FALLING, FALLING, ..]:
@@ -171,6 +183,10 @@ func _physics_process(delta: float) -> void:
 			var walk_speed = walk_curve.sample_baked(age)
 			walk_effect = walk_speed if input_right else -walk_speed
 			
+			if control_state[0] == SMALL:
+				walk_effect *= 0.75
+				
+			$Sprite.flip_h = input_sign.x > 0
 			if $VisualRoot.scale.x != -input_sign.x:
 				var s = Vector2(float(-input_sign.x), 1.0)
 				if s.x != 0:
@@ -209,17 +225,21 @@ func _physics_process(delta: float) -> void:
 			if pushback != 0:
 				velocity.y = 0
 				velocity.x = 150 * pushback
-				Game.ghost_trail($VisualRoot/Sprite)
+				Game.ghost_trail($Sprite)
 		[COOLDOWN, DAMAGE, ..]:
-			$VisualRoot/Sprite.material = null
+			$Sprite.material = null
 		[COOLDOWN, _, var age, ..]:
 			var opacity = 1.0 if sin(age*50) < 0.0 else 0.5
-			$VisualRoot/Sprite.self_modulate = Color(1,1,1, opacity)
+			$Sprite.self_modulate = Color(1,1,1, opacity)
 		[READY, COOLDOWN, ..]:
-			$VisualRoot/Sprite.self_modulate = Color(1,1,1,1)
+			$Sprite.self_modulate = Color(1,1,1,1)
 		[KO, ..]:
 			velocity.x = 0
 			velocity.y = 0
+		[SMALL, READY, ..]:
+			$AnimationPlayer.play("shrink")
+		[READY, SMALL, ..]:
+			$AnimationPlayer.play("grow")
 	
 	var _collision_info = move_and_slide()
 	on_player_move.emit(delta)

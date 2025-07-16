@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://d2crk1xd0mlix"]
+[gd_scene load_steps=16 format=3 uid="uid://d2crk1xd0mlix"]
 
 [ext_resource type="Script" uid="uid://dksvsmop5dt5u" path="res://actors/player/red_manager.gd" id="1_4wdqj"]
 [ext_resource type="Texture2D" uid="uid://lm1xfcddkb0i" path="res://actors/player/red.png" id="1_eixpp"]
@@ -23,6 +23,196 @@ size = Vector2(10, 28)
 [sub_resource type="LabelSettings" id="LabelSettings_uahb5"]
 font = ExtResource("3_nwvg0")
 font_size = 8
+
+[sub_resource type="Animation" id="Animation_aunb7"]
+resource_name = "shrink"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CollisionShape2D:shape:size")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(10, 28), Vector2(2.5, 7)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(0.25, 0.25)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.0333333, 0.0666667, 0.1, 0.133333, 0.166667, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"values": [{
+"args": [],
+"method": &"ghost"
+}, {
+"args": [],
+"method": &"ghost"
+}, {
+"args": [],
+"method": &"ghost"
+}, {
+"args": [],
+"method": &"ghost"
+}, {
+"args": [],
+"method": &"ghost"
+}, {
+"args": [],
+"method": &"ghost"
+}, {
+"args": [],
+"method": &"ghost"
+}]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("CollisionShape2D:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 2), Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_d6p7h"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CollisionShape2D:shape:size")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(10, 28)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("CollisionShape2D:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 2)]
+}
+
+[sub_resource type="Animation" id="Animation_c8jjq"]
+resource_name = "grow"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CollisionShape2D:shape:size")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(2.5, 7), Vector2(10, 28)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0.25, 0.25), Vector2(1, 1)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.0333333, 0.0666667, 0.1, 0.133333, 0.166667, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"values": [{
+"args": [],
+"method": &"ghost"
+}, {
+"args": [],
+"method": &"ghost"
+}, {
+"args": [],
+"method": &"ghost"
+}, {
+"args": [],
+"method": &"ghost"
+}, {
+"args": [],
+"method": &"ghost"
+}, {
+"args": [],
+"method": &"ghost"
+}, {
+"args": [],
+"method": &"ghost"
+}]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("CollisionShape2D:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 2)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_c8jjq"]
+_data = {
+&"RESET": SubResource("Animation_d6p7h"),
+&"grow": SubResource("Animation_c8jjq"),
+&"shrink": SubResource("Animation_aunb7")
+}
 
 [sub_resource type="GDScript" id="GDScript_nefka"]
 resource_name = "PlayerCamera"
@@ -56,6 +246,7 @@ size = Vector2(20, 58)
 script = ExtResource("1_4wdqj")
 
 [node name="Red" type="CharacterBody2D" parent="." groups=["player"]]
+physics_interpolation_mode = 1
 collision_layer = 2
 script = ExtResource("1_nefka")
 jump_curve = SubResource("Curve_uahb5")
@@ -75,10 +266,10 @@ offset_bottom = 28.0
 text = "few"
 label_settings = SubResource("LabelSettings_uahb5")
 
-[node name="VisualRoot" type="Node2D" parent="Red"]
-
-[node name="Sprite" type="Sprite2D" parent="Red/VisualRoot"]
+[node name="Sprite" type="Sprite2D" parent="Red"]
 texture = ExtResource("1_eixpp")
+
+[node name="VisualRoot" type="Node2D" parent="Red"]
 
 [node name="Marker2D" type="Marker2D" parent="Red/VisualRoot"]
 position = Vector2(0, -24)
@@ -115,6 +306,11 @@ gizmo_extents = 1.5
 position = Vector2(-12, -8)
 rotation = -3.14159
 gizmo_extents = 1.5
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Red"]
+libraries = {
+&"": SubResource("AnimationLibrary_c8jjq")
+}
 
 [node name="Camera2D" type="Camera2D" parent="." node_paths=PackedStringArray("target", "shape")]
 physics_interpolation_mode = 1
