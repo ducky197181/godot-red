@@ -27,7 +27,7 @@ Red can shift to his normal size, which allows him to enter spaces he couldn't a
 
 ## Levels
 
-This section contains preliminary concepts.
+This section contains preliminary concepts. Levels are [prototyped in Figma](https://www.figma.com/design/QjhiadDaUZVFVTt1IHCnpY/Untitled?node-id=0-1&t=0OMR7XMnwO8Tupst-1).
 
 Game has four levels, or maps, and one of these is the final level. Player chooses the order they play these levels, even being able to start with the last and hardest level.
 
