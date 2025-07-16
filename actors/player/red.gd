@@ -158,7 +158,7 @@ func _physics_process(delta: float) -> void:
 	match vertical_state:
 		[GROUNDED, ..]:
 			jump_curve_time = jump_curve.get_point_position(1).x
-		[JUMPING, GROUNDED, ..]:
+		[JUMPING, _, ..]:
 			jump_curve_time = 0.0
 		[FALLING, JUMPING, ..]:
 			jump_curve_time = jump_curve.get_point_position(1).x
