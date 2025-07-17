@@ -198,7 +198,22 @@ func _physics_process(delta: float) -> void:
 		[ATTACK, _, _, var prev_age]:
 			var bullet = projectiles[0]
 			var placement: Node2D = $VisualRoot/AimLoc/AimForward
-			match [abs(input_sign.x), input_sign.y]:
+			
+			# Determining throw direction from analogue stick
+			const sector = PI / 6 # 30 degrees
+			var ang_rad = atan2(input_vector.y, abs(input_vector.x))
+			
+			var dir = [0,0]
+			
+			if ang_rad < sector * 2 and ang_rad > sector * -2: # Forwardish
+				dir[0] = 1
+				
+			if ang_rad > sector: # Up-ish
+				dir[1] = 1
+			elif ang_rad < -sector: # Down-ish
+				dir[1] = -1
+			
+			match dir:
 				[0,1,..]: # Up
 					placement = $VisualRoot/AimLoc/AimUp
 				[1,1,..]: # Up angle
