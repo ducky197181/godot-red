@@ -96,7 +96,6 @@ tips/show_jitter_tips=false
 
 2d/run_on_separate_thread=true
 common/physics_jitter_fix=0.0
-common/physics_interpolation=true
 
 [rendering]
 
