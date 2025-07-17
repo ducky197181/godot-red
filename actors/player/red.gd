@@ -28,6 +28,7 @@ const DAMAGE = "damage"
 const KO = "KO"
 const NONE = "NONE"
 const SMALL = "small"
+const DASH = "dash"
 
 # States: Current, Previous, Current age, Previous age
 var control_state := [UNKNOWN, UNKNOWN, 0.0, 0.0]
@@ -77,7 +78,9 @@ var input_left:float
 var input_right:float
 var input_vector:Vector2
 var input_sign:Vector2i
+var input_dir:Vector2i
 var input_jump:bool
+var input_jump_released:int
 
 func _physics_process(delta: float) -> void:
 	var walk_effect : float = 0.0
@@ -91,13 +94,34 @@ func _physics_process(delta: float) -> void:
 	var size_shift:bool
 	
 	if process_input:
+		input_jump = Input.is_action_pressed("jump")
 		input_left = Input.is_action_pressed("move_left")
 		input_right = Input.is_action_pressed("move_right")
-		input_vector = Input.get_vector("move_left", "move_right", "Down", "Up")
+		input_vector = Input.get_vector("move_left", "move_right", "down", "up")
 		input_sign = Vector2i(sign(input_vector.x), sign(input_vector.y))
-		input_jump = Input.is_action_pressed("jump")
-		attack = Input.is_action_just_pressed("Fire")
+		attack = Input.is_action_just_pressed("fire")
 		size_shift = Input.is_action_just_pressed("size_toggle")
+		input_dir = Vector2i(0,0)
+		
+		if Input.is_action_just_released("jump"):
+			input_jump_released = Time.get_ticks_msec()
+		
+		# Determining throw direction from analogue stick
+		if input_vector.length_squared() > 0.0:
+			const sector = PI / 6 # 30 degrees
+			var ang_rad = atan2(input_vector.y, input_vector.x)
+
+			if ang_rad < sector * 2 and ang_rad > sector * -2: # Forwardish
+				input_dir.x = 1
+			elif ang_rad > sector * 4 or ang_rad < sector * -4: # Back-ish
+				input_dir.x = -1
+				
+			if ang_rad > sector and ang_rad < sector * 5: # Up-ish
+				input_dir.y = 1
+			elif ang_rad < -sector and ang_rad > -sector * 5: # Down-ish
+				input_dir.y = -1
+		
+		
 	
 	grounded_timer = switch_timer(grounded_timer, delta, is_on_floor())
 	jump_timer = switch_timer(jump_timer, delta, input_jump)
@@ -113,7 +137,7 @@ func _physics_process(delta: float) -> void:
 		[READY, DAMAGE]: # 
 			change_state(vertical_state, UNKNOWN)
 			change_state(horizontal_state, UNKNOWN)
-		[DAMAGE, READY, ..]:
+		[DAMAGE, var x, ..] when x != DAMAGE:
 			change_state(vertical_state, DAMAGE)
 			change_state(horizontal_state, DAMAGE)
 		[DAMAGE, _, var age, ..] when age > 0.2:
@@ -151,7 +175,15 @@ func _physics_process(delta: float) -> void:
 			print("coyote")
 			change_state(vertical_state, JUMPING)
 		[GROUNDED, ..] when fuzzy(jump_timer): # jump on ground
-			change_state(vertical_state, JUMPING)
+			if input_dir.y == -1 and control_state[0] == SMALL: # Dash
+				if horizontal_state[0] != DASH:
+					change_state(horizontal_state, DASH)
+				else:
+					var start = Time.get_ticks_msec() - (horizontal_state[2] * 1000)
+					if input_jump_released > start:
+						change_state(vertical_state, JUMPING)
+			else:
+				change_state(vertical_state, JUMPING)
 		[GROUNDED, ..] when grounded_timer < 0:
 			change_state(vertical_state, FALLING)
 
@@ -162,6 +194,9 @@ func _physics_process(delta: float) -> void:
 			change_state(horizontal_state, WALKING)
 		[WALKING, ..] when not input_left and not input_right: # stop walking
 			change_state(horizontal_state, IDLE)
+		[DASH, _, var age, ..] when age > 0.25 and grounded_timer > 0:
+			var st = WALKING if input_left != input_right else IDLE
+			change_state(horizontal_state, st)
 	
 	# React to state
 	
@@ -193,38 +228,27 @@ func _physics_process(delta: float) -> void:
 					$VisualRoot.scale = s
 		[IDLE, ..]:
 			walk_effect = 0.0
+		[DASH, ..]:
+			walk_effect = 200.0 if $Sprite.flip_h else -200.0
+			Game.ghost_trail($Sprite)
 	
 	match attack_state:
 		[ATTACK, _, _, var prev_age]:
 			var bullet = projectiles[0]
 			var placement: Node2D = $VisualRoot/AimLoc/AimForward
-			
-			# Determining throw direction from analogue stick
-			const sector = PI / 6 # 30 degrees
-			var ang_rad = atan2(input_vector.y, abs(input_vector.x))
-			
-			var dir = [0,0]
-			
-			if ang_rad < sector * 2 and ang_rad > sector * -2: # Forwardish
-				dir[0] = 1
-				
-			if ang_rad > sector: # Up-ish
-				dir[1] = 1
-			elif ang_rad < -sector: # Down-ish
-				dir[1] = -1
-			
-			match dir:
-				[0,1,..]: # Up
-					placement = $VisualRoot/AimLoc/AimUp
-				[1,1,..]: # Up angle
-					placement = $VisualRoot/AimLoc/AimUpForward
-				[1,-1,..]: # Down angle
-					placement = $VisualRoot/AimLoc/AimDownForward
-				[0,-1,..]:
-					if vertical_state[0] == GROUNDED:
-						placement = $VisualRoot/AimLoc/AimCrouched
-					else:
-						placement = $VisualRoot/AimLoc/AimDown
+			if horizontal_state[0] != DASH:
+				match [abs(input_dir.x), input_dir.y]:
+					[0,1,..]: # Up
+						placement = $VisualRoot/AimLoc/AimUp
+					[1,1,..]: # Up angle
+						placement = $VisualRoot/AimLoc/AimUpForward
+					[1,-1,..]: # Down angle
+						placement = $VisualRoot/AimLoc/AimDownForward
+					[0,-1,..]:
+						if vertical_state[0] == GROUNDED:
+							placement = $VisualRoot/AimLoc/AimCrouched
+						else:
+							placement = $VisualRoot/AimLoc/AimDown
 			shoot.emit(bullet, placement.global_transform, prev_age)
 	
 	var a := jump_curve.sample(jump_curve_time)
