@@ -9,11 +9,11 @@ radius = 6.0
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_vc4or")
 
-[node name="ProjectileA" type="Area2D" parent="."]
+[node name="ProjectileA" type="CharacterBody2D" parent="."]
 rotation = 3.14159
 collision_layer = 0
 collision_mask = 7
-monitorable = false
+motion_mode = 1
 
 [node name="Plh" type="Sprite2D" parent="ProjectileA"]
 texture = ExtResource("1_y05jg")
@@ -21,8 +21,15 @@ texture = ExtResource("1_y05jg")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ProjectileA"]
 shape = SubResource("CircleShape2D_vc4or")
 
+[node name="Area2D" type="Area2D" parent="ProjectileA"]
+collision_layer = 0
+collision_mask = 7
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ProjectileA/Area2D"]
+shape = SubResource("CircleShape2D_vc4or")
+
 [node name="Marker2D" type="Marker2D" parent="."]
 position = Vector2(112, 0)
 
-[connection signal="area_entered" from="ProjectileA" to="." method="_on_projectile_a_area_entered"]
-[connection signal="body_entered" from="ProjectileA" to="." method="_on_projectile_a_body_entered"]
+[connection signal="area_entered" from="ProjectileA/Area2D" to="." method="_on_projectile_a_body_entered"]
