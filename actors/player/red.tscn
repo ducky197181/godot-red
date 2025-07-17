@@ -315,6 +315,7 @@ libraries = {
 [node name="Camera2D" type="Camera2D" parent="." node_paths=PackedStringArray("target", "shape")]
 physics_interpolation_mode = 1
 position = Vector2(0, -24)
+process_callback = 0
 editor_draw_limits = true
 script = SubResource("GDScript_nefka")
 target = NodePath("../Red/VisualRoot/Marker2D")
