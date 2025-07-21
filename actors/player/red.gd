@@ -29,6 +29,10 @@ const KO = "KO"
 const NONE = "NONE"
 const SMALL = "small"
 const DASH = "dash"
+const LARGE:StringName = "large"
+const GROWING:StringName = "growing"
+const SMALL:StringName = "small"
+const SHRINKING:StringName = "shrinking"
 
 # States: Current, Previous, Current age, Previous age
 var control_state := [UNKNOWN, UNKNOWN, 0.0, 0.0]
@@ -148,10 +152,20 @@ func _physics_process(delta: float) -> void:
 			Game.player_health = 20
 			Game.load_scene("res://tilesets/test.tscn")
 			change_state(control_state, NONE)
-		[READY, ..] when size_shift:
-			change_state(control_state, SMALL)
+	
+	match size_state:
+		[UNKNOWN, ..]:
+			change_state(size_state, LARGE)
+		[LARGE, ..] when size_shift:
+			change_state(size_state, SHRINKING)
 		[SMALL, ..] when size_shift:
-			change_state(control_state, READY)
+			change_state(vertical_state, UNKNOWN)
+			change_state(size_state, GROWING)
+		[GROWING, _, var age, ..] when age > 0.2:
+			change_state(size_state, LARGE)
+		[SHRINKING, _, var age, ..] when age > 0.2:
+			change_state(size_state, SMALL)
+			
 	
 	match attack_state:
 		[UNKNOWN, ..]:
@@ -275,10 +289,20 @@ func _physics_process(delta: float) -> void:
 		[KO, ..]:
 			velocity.x = 0
 			velocity.y = 0
-		[SMALL, READY, ..]:
+	
+	match size_state:
+		[SHRINKING, LARGE, ..]:
 			$AnimationPlayer.play("shrink")
-		[READY, SMALL, ..]:
+			set_collision_mask_value(4, false) # do not collide with `world_big`
+			set_collision_mask_value(5, true) # collide with `world` and `world_small`
+			set_collision_layer_value(6, false) # exit `player_big` layer
+			set_collision_layer_value(7, true) # enter `player_small` layer
+		[GROWING, SMALL, ..]:
 			$AnimationPlayer.play("grow")
+			set_collision_mask_value(4, true) # collide with `world` and `world_big`
+			set_collision_mask_value(5, false) # do not collide with `world_small`
+			set_collision_layer_value(6, true) # enter `player_big` layer
+			set_collision_layer_value(7, false) # exit `player_small` layer
 	
 	var _collision_info = move_and_slide()
 	on_player_move.emit(delta)
