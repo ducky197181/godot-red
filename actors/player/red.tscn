@@ -247,7 +247,8 @@ script = ExtResource("1_4wdqj")
 
 [node name="Red" type="CharacterBody2D" parent="." groups=["player"]]
 physics_interpolation_mode = 1
-collision_layer = 2
+collision_layer = 34
+collision_mask = 9
 script = ExtResource("1_nefka")
 jump_curve = SubResource("Curve_uahb5")
 walk_curve = SubResource("Curve_nwvg0")
