@@ -58,7 +58,8 @@ func command(attributes: Dictionary) -> void:
 	if control_state[0] == READY:
 		match attributes:
 			{"damage": var dmg, ..}:
-				Game.affect_player_health(-absi(dmg))
+				var size_multiply = 4 if size_state[0] == SMALL else 1
+				Game.affect_player_health(-absi(dmg) * size_multiply)
 				$Sprite.material = Game.blink_sprite
 				var next_state = DAMAGE if Game.player_health > 0 else KO
 				change_state(control_state, next_state)
