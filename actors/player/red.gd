@@ -73,7 +73,8 @@ func command(attributes: Dictionary) -> void:
 		
 func change_state(state_group:Array, state) -> void:
 	state_group[0] = state
-	state_group[3] = state_group[2]
+	if state_group[2] > 0.0:
+		state_group[3] = state_group[2]
 	state_group[2] = 0.0
 
 # Keep movement inputs from previous process.
